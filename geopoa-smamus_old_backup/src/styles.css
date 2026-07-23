@@ -1,0 +1,487 @@
+/* ============================================================
+   GeoPOA · SMAMUS — Design System
+   Paleta ancorada no padrão gov.br (usado pela Prefeitura de
+   Porto Alegre): azul institucional, apoio em verde-sustentabilidade,
+   e rampa térmica reservada para os dados de temperatura.
+   ============================================================ */
+
+:root {
+  /* Azuis institucionais (gov.br) */
+  --azul-gov: #1351b4;
+  --azul-gov-escuro: #0c326f;
+  --azul-gov-claro: #c5d4eb;
+  --azul-gov-suave: #e8eef7;
+
+  /* Verde sustentabilidade (apoio SMAMUS / meio ambiente) */
+  --verde: #168821;
+  --verde-escuro: #0d5e17;
+  --verde-claro: #e3f5e1;
+
+  /* Amarelo gov.br (destaques pontuais) */
+  --amarelo: #ffcd07;
+
+  /* Neutros */
+  --cinza-90: #1b1b1b;
+  --cinza-80: #333333;
+  --cinza-70: #555555;
+  --cinza-60: #767676;
+  --cinza-40: #b0b0b0;
+  --cinza-20: #e6e6e6;
+  --cinza-10: #f0f0f0;
+  --cinza-05: #f8f8f8;
+  --branco: #ffffff;
+
+  /* Rampa térmica (somente para dados de temperatura) */
+  --temp-fria: #2c7fb8;
+  --temp-media: #fec44f;
+  --temp-quente: #d7301f;
+
+  /* Cores de certificação */
+  --cert-bronze: #cd7f32;
+  --cert-prata: #8a9197;
+  --cert-ouro: #d4a017;
+  --cert-diamante: #1351b4;
+
+  /* Tipografia */
+  --font-titulo: 'Rawline', 'Inter', system-ui, sans-serif;
+  --font-corpo: 'Inter', system-ui, sans-serif;
+
+  /* Layout */
+  --raio: 8px;
+  --raio-lg: 12px;
+  --sombra: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --sombra-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --largura-max: 1280px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-corpo);
+  color: var(--cinza-80);
+  background: var(--cinza-05);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-titulo);
+  color: var(--cinza-90);
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+a {
+  color: var(--azul-gov);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: var(--font-corpo);
+  cursor: pointer;
+}
+
+/* ===================== Barra superior gov.br ===================== */
+.barra-gov {
+  background: var(--azul-gov-escuro);
+  color: var(--branco);
+  font-size: 12px;
+  padding: 4px 0;
+}
+.barra-gov .conteudo {
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ===================== Cabeçalho ===================== */
+.cabecalho {
+  background: var(--branco);
+  border-bottom: 3px solid var(--azul-gov);
+  box-shadow: var(--sombra);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.cabecalho .conteudo {
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.cabecalho .marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cabecalho .brasao {
+  width: 44px;
+  height: 44px;
+  background: var(--azul-gov);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--branco);
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.cabecalho .titulos h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--azul-gov-escuro);
+}
+.cabecalho .titulos p {
+  font-size: 12px;
+  color: var(--cinza-60);
+}
+.cabecalho .secretaria {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--cinza-60);
+  text-align: right;
+}
+
+/* ===================== Hero ===================== */
+.hero {
+  background: linear-gradient(135deg, var(--azul-gov-escuro) 0%, var(--azul-gov) 100%);
+  color: var(--branco);
+  padding: 48px 0;
+}
+.hero .conteudo {
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.hero .eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+.hero h2 {
+  color: var(--branco);
+  font-size: 34px;
+  font-weight: 700;
+  max-width: 720px;
+  margin-bottom: 12px;
+}
+.hero p {
+  font-size: 16px;
+  max-width: 620px;
+  opacity: 0.92;
+}
+
+/* ===================== Container geral ===================== */
+.container {
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.secao {
+  margin-bottom: 40px;
+}
+.secao-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--azul-gov);
+  margin-bottom: 4px;
+}
+.secao-subtitulo {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--cinza-90);
+  margin-bottom: 8px;
+}
+.secao-desc {
+  font-size: 14px;
+  color: var(--cinza-70);
+  max-width: 680px;
+  margin-bottom: 20px;
+}
+
+/* ===================== Cards de indicadores ===================== */
+.grid-indicadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.card-indicador {
+  background: var(--branco);
+  border: 1px solid var(--cinza-20);
+  border-left: 4px solid var(--azul-gov);
+  border-radius: var(--raio);
+  padding: 20px;
+  box-shadow: var(--sombra);
+}
+.card-indicador.verde {
+  border-left-color: var(--verde);
+}
+.card-indicador.amarelo {
+  border-left-color: var(--amarelo);
+}
+.card-indicador.quente {
+  border-left-color: var(--temp-quente);
+}
+.card-indicador .rotulo {
+  font-size: 13px;
+  color: var(--cinza-60);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.card-indicador .valor {
+  font-family: var(--font-titulo);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--cinza-90);
+  line-height: 1;
+}
+.card-indicador .unidade {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--cinza-60);
+}
+
+/* ===================== Cards / Painéis ===================== */
+.painel {
+  background: var(--branco);
+  border: 1px solid var(--cinza-20);
+  border-radius: var(--raio-lg);
+  padding: 24px;
+  box-shadow: var(--sombra);
+}
+.painel-titulo {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.painel-desc {
+  font-size: 13px;
+  color: var(--cinza-70);
+  margin-bottom: 16px;
+}
+
+.grid-graficos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .grid-graficos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================== Mapa ===================== */
+.mapa-wrapper {
+  position: relative;
+  border-radius: var(--raio-lg);
+  overflow: hidden;
+  border: 1px solid var(--cinza-20);
+  box-shadow: var(--sombra);
+}
+.mapa-container {
+  height: 520px;
+  width: 100%;
+}
+
+.controle-tempo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--branco);
+  border: 1px solid var(--cinza-20);
+  border-radius: var(--raio);
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--sombra);
+}
+.botao-play {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--azul-gov);
+  color: var(--branco);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.botao-play:hover {
+  background: var(--azul-gov-escuro);
+}
+.slider-tempo {
+  flex: 1;
+  accent-color: var(--azul-gov);
+  height: 6px;
+}
+.periodo-atual {
+  font-family: var(--font-titulo);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--azul-gov-escuro);
+  min-width: 90px;
+  text-align: right;
+}
+
+/* ===================== Legenda ===================== */
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--cinza-70);
+}
+.legenda .item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legenda .ponto {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ===================== Tooltip do mapa ===================== */
+.tooltip-emp {
+  font-family: var(--font-corpo);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.tooltip-emp strong {
+  font-size: 14px;
+  color: var(--azul-gov-escuro);
+}
+
+/* ===================== Painel lateral de detalhe ===================== */
+.layout-mapa {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+}
+@media (max-width: 1000px) {
+  .layout-mapa {
+    grid-template-columns: 1fr;
+  }
+}
+.painel-detalhe {
+  background: var(--branco);
+  border: 1px solid var(--cinza-20);
+  border-radius: var(--raio-lg);
+  padding: 20px;
+  box-shadow: var(--sombra);
+  height: fit-content;
+}
+.painel-detalhe .vazio {
+  color: var(--cinza-60);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 0;
+}
+.badge-cert {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 100px;
+  color: var(--branco);
+}
+.detalhe-linha {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cinza-10);
+  font-size: 13px;
+}
+.detalhe-linha .chave {
+  color: var(--cinza-60);
+}
+.detalhe-linha .valor {
+  font-weight: 600;
+  color: var(--cinza-90);
+}
+
+/* ===================== Rodapé ===================== */
+.rodape {
+  background: var(--azul-gov-escuro);
+  color: var(--branco);
+  padding: 32px 0;
+  margin-top: 48px;
+}
+.rodape .conteudo {
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding: 0 24px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+.rodape .conteudo strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.aviso-poc {
+  background: var(--amarelo);
+  color: var(--cinza-90);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px;
+}
+
+/* ===================== Filtros ===================== */
+.filtros {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.filtro-btn {
+  border: 1px solid var(--cinza-20);
+  background: var(--branco);
+  color: var(--cinza-70);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 100px;
+  transition: all 0.15s;
+}
+.filtro-btn:hover {
+  border-color: var(--azul-gov);
+  color: var(--azul-gov);
+}
+.filtro-btn.ativo {
+  background: var(--azul-gov);
+  border-color: var(--azul-gov);
+  color: var(--branco);
+}
