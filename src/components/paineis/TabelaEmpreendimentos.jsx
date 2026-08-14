@@ -1,13 +1,20 @@
 import { useMemo, useState } from 'react'
-import { CERT_CORES, formatarDelta } from '../../data/utils'
+import { formatarDelta } from '../../data/utils'
 
 const CERTIFICACOES = ['Todos', 'BRONZE', 'PRATA', 'OURO', 'DIAMANTE']
 const POR_PAGINA = 15
 
+const MEDALHAS = {
+  DIAMANTE: '/medals/diamond_medal.png',
+  OURO: '/medals/gold-medal.png',
+  PRATA: '/medals/silver-medal.png',
+  BRONZE: '/medals/bronze-medal.png',
+}
+
 const COLUNAS_FIXAS = [
+  { chave: 'certificado', rotulo: 'Certificação' },
   { chave: 'sei', rotulo: 'SEI' },
   { chave: 'endereco', rotulo: 'Endereço' },
-  { chave: 'certificado', rotulo: 'Certificação' },
   { chave: 'ano_certificacao', rotulo: 'Ano cert.' },
 ]
 
@@ -23,10 +30,7 @@ const COLUNAS_GRUPO = {
   temperatura: [
     { chave: 'media_pre2023', rotulo: 'Temp. pré-2023', formato: 'temp' },
     { chave: 'media_pos2023', rotulo: 'Temp. pós-2023', formato: 'temp' },
-    { chave: 'temp_atual', rotulo: 'Temp. atual', formato: 'temp' },
     { chave: 'delta_2023', rotulo: 'Variação', formato: 'delta' },
-    { chave: 'delta_total', rotulo: 'Delta total', formato: 'delta' },
-    { chave: 'slope_linear', rotulo: 'Slope linear', formato: 'numero3' },
   ],
   arborizacao: [
     { chave: 'arvores_implantadas', rotulo: 'Árvores implantadas' },
@@ -64,7 +68,7 @@ function formatarValor(valor, formato) {
   }
 }
 
-export default function TabelaEmpreendimentos({ empreendimentos }) {
+export default function TabelaEmpreendimentos({ empreendimentos, onMonitorar }) {
   const [busca, setBusca] = useState('')
   const [filtroCert, setFiltroCert] = useState('Todos')
   const [gruposAtivos, setGruposAtivos] = useState(new Set(['temperatura']))
@@ -77,10 +81,7 @@ export default function TabelaEmpreendimentos({ empreendimentos }) {
   ], [gruposAtivos])
 
   const filtrados = useMemo(() => {
-    let lista = empreendimentos.map(e => ({
-      ...e,
-      temp_atual: e.periodos[e.periodos.length - 1]?.temp ?? null,
-    }))
+    let lista = empreendimentos
     if (filtroCert !== 'Todos') lista = lista.filter(e => e.certificado === filtroCert)
     if (busca.trim()) {
       const termo = busca.trim().toLowerCase()
@@ -178,6 +179,7 @@ export default function TabelaEmpreendimentos({ empreendimentos }) {
                   </span>
                 </th>
               ))}
+              <th>Monitoramento</th>
             </tr>
           </thead>
           <tbody>
@@ -187,9 +189,12 @@ export default function TabelaEmpreendimentos({ empreendimentos }) {
                   if (col.chave === 'certificado') {
                     return (
                       <td key={col.chave}>
-                        <span className="badge-cert" style={{ background: CERT_CORES[e.certificado] }}>
-                          {e.certificado}
-                        </span>
+                        <img
+                          src={MEDALHAS[e.certificado]}
+                          alt={e.certificado}
+                          title={e.certificado}
+                          style={{ width: 28, height: 28 }}
+                        />
                       </td>
                     )
                   }
@@ -203,6 +208,15 @@ export default function TabelaEmpreendimentos({ empreendimentos }) {
                     </td>
                   )
                 })}
+                <td>
+                  <button
+                    className="filtro-btn"
+                    onClick={() => onMonitorar?.(e.sei)}
+                    title="Ver monitoramento deste empreendimento"
+                  >
+                    📷 Monitorar
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

@@ -40,7 +40,20 @@
       "Bash(curl -sI -H \"Origin: http://localhost:5173\" \"https://arcgis-ope.codexremote.com.br/portal/sharing/rest/portals/self?f=json\")",
       "PowerShell(Get-Process -Id 12148 -ErrorAction SilentlyContinue)",
       "PowerShell(Stop-Process -Id 12148 -Force -ErrorAction SilentlyContinue)",
-      "PowerShell(Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue)"
+      "PowerShell(Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue)",
+      "Bash(cd \"C:\\\\Users\\\\henrique.prado\\\\Documents\" && find . -maxdepth 2 -iname \"*fut*\" -o -iname \"*racha*\" 2>/dev/null | head -50)",
+      "Bash(markitdown \"C:\\\\Users\\\\henrique.prado\\\\Downloads\\\\Futebol de Segunda - Ranking dos Jogadores \\(1\\).xlsx\")",
+      "Bash(python -c \"import openpyxl; wb = openpyxl.load_workbook\\(r'C:\\\\Users\\\\henrique.prado\\\\Downloads\\\\Futebol de Segunda - Ranking dos Jogadores \\(1\\).xlsx', data_only=True\\); print\\(wb.sheetnames\\)\")",
+      "Bash(python -m pip install openpyxl pandas --quiet)",
+      "Bash(ls -la \"C:\\\\Users\\\\henrique.prado\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\\" 2>&1 | grep sheet_)",
+      "Bash(npx --yes create-next-app@latest \"fut-de-segunda-tmp\" --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(rm -f public/file.svg public/globe.svg public/next.svg public/vercel.svg public/window.svg)",
+      "Bash(node scripts/generate-icons.mjs)",
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)",
+      "Bash(cp .env.local.example .env.local)",
+      "Bash(npx next *)",
+      "Bash(npm run *)"
     ]
   }
 }

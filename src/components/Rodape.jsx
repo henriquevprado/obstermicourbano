@@ -8,7 +8,7 @@ export default function Rodape() {
           </strong>
           <br />
           Dados: Landsat / Google Earth Engine · Análise: Zonal Statistics
-          (buffer 200 m) · Série: Janeiro 2016–2026 (sem 2018/2019)
+          (buffer 200 m) · Série: Janeiro 2017–2026 (sem 2018/2019)
           <br />
           Esta é uma demonstração técnica — não constitui publicação oficial
           da Prefeitura Municipal de Porto Alegre.

@@ -39,7 +39,7 @@ export default function AbaProjecao() {
         <div className="secao-titulo">Cenário</div>
         <div className="secao-subtitulo">Tendência histórica vs. programa de certificação</div>
         <p className="secao-desc">
-          Extrapolação da regressão linear 2016–2022 (sem programa) e
+          Extrapolação da regressão linear 2017–2022 (sem programa) e
           2023–2026 (com programa) até 2035, com os valores reais
           observados marcados como pontos.
         </p>
@@ -47,7 +47,7 @@ export default function AbaProjecao() {
           <ResponsiveContainer width="100%" height={340}>
             <ComposedChart data={DADOS_GRAFICO_PROJECAO}>
               <CartesianGrid stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="ano" type="number" domain={[2016, 2035]} stroke="var(--text-muted)" fontSize={12} />
+              <XAxis dataKey="ano" type="number" domain={[2017, 2035]} stroke="var(--text-muted)" fontSize={12} />
               <YAxis
                 stroke="var(--text-muted)"
                 fontSize={12}

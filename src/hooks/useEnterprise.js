@@ -80,7 +80,8 @@ export function useEmpreendimentos() {
 }
 
 // Imagens do Google Earth Pro: uso interno/demonstrativo apenas — não
-// publicar em portal oficial público sem licenciamento adequado.
+// publicar em portal oficial público sem licenciamento adequado. Usado só
+// quando o empreendimento não tem NENHUM anexo no Enterprise.
 export const FALLBACK_IMAGENS = {
   '23.0.000104967-4': [
     { nome: 'Antes (2022)', url: '/swipe/koseritz_antes_2022.jpg' },
@@ -91,6 +92,13 @@ export const FALLBACK_IMAGENS = {
 function extrairAno(nomeArquivo) {
   const match = nomeArquivo.match(/(\d{4})/)
   return match ? parseInt(match[1], 10) : null
+}
+
+function classificarAnexo(nomeArquivo) {
+  return {
+    ano: extrairAno(nomeArquivo),
+    tipo: /fachada/i.test(nomeArquivo) ? 'fachada' : 'topo',
+  }
 }
 
 async function buscarAnexos(objectId) {
@@ -105,12 +113,10 @@ async function buscarAnexos(objectId) {
 }
 
 /**
- * Busca os anexos (fotos) de um empreendimento no ArcGIS, ordena por ano
- * extraído do nome do arquivo e rotula o mais antigo como "Antes" e o mais
- * recente como "Depois". Se não houver anexos, cai no fallback local
- * (FALLBACK_IMAGENS) indexado por SEI.
+ * Busca os anexos reais do Enterprise. Se não houver nenhum, cai no
+ * FALLBACK_IMAGENS (para empreendimentos sem nenhum anexo cadastrado ainda).
  */
-export async function buscarAnexosOrdenados(objectId, sei) {
+async function buscarAnexosCompletos(objectId, sei) {
   let anexos = []
   try {
     anexos = await buscarAnexos(objectId)
@@ -118,20 +124,38 @@ export async function buscarAnexosOrdenados(objectId, sei) {
     anexos = []
   }
 
-  const comAno = anexos
-    .map(a => ({ ...a, ano: extrairAno(a.nome) }))
+  if (anexos.length === 0) {
+    const fallback = FALLBACK_IMAGENS[sei] || []
+    return fallback.map((f, i) => ({ ...f, id: `fallback-${i}` }))
+  }
+
+  return anexos
+}
+
+/**
+ * Busca os anexos (fotos) de um empreendimento, ordena por ano extraído do
+ * nome do arquivo e rotula: fotos de fachada como "Fachada (ano)"; entre as
+ * aéreas ("topo"), a mais antiga vira "Antes", a mais recente "Depois" e
+ * as intermediárias "Durante a obra" — tudo com o ano ao lado.
+ */
+export async function buscarAnexosOrdenados(objectId, sei) {
+  const anexos = await buscarAnexosCompletos(objectId, sei)
+
+  const comInfo = anexos
+    .map(a => ({ ...a, ...classificarAnexo(a.nome) }))
     .filter(a => a.ano !== null)
     .sort((a, b) => a.ano - b.ano)
 
-  if (comAno.length === 0) {
-    const fallback = FALLBACK_IMAGENS[sei]
-    return fallback ? fallback.map((f, i) => ({ ...f, id: `fallback-${i}` })) : []
-  }
+  const aereas = comInfo.filter(a => a.tipo !== 'fachada')
 
-  return comAno.map((a, i, arr) => ({
-    ...a,
-    nome: i === 0 ? `Antes (${a.ano})`
-      : i === arr.length - 1 ? `Depois (${a.ano})`
-        : `${a.ano}`,
-  }))
+  return comInfo.map(a => {
+    if (a.tipo === 'fachada') {
+      return { ...a, nome: `Fachada (${a.ano})` }
+    }
+    const idx = aereas.indexOf(a)
+    const nome = idx === 0 ? `Antes (${a.ano})`
+      : idx === aereas.length - 1 ? `Depois (${a.ano})`
+        : `Durante a obra (${a.ano})`
+    return { ...a, nome }
+  })
 }

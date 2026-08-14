@@ -1,12 +1,11 @@
 export const REGRESSAO = {
-  semPrograma: { slope: 0.9043, intercept: -1787.09, periodo: '2016–2022' },
+  semPrograma: { slope: 0.8474, intercept: -1672.22, periodo: '2017–2022' },
   comPrograma: { slope: 0.4006, intercept: -774.23, periodo: '2023–2026' },
 }
 
 export const DADOS_REAIS_SEM = [
-  { ano: 2016, temp: 34.909 }, { ano: 2017, temp: 35.718 },
-  { ano: 2020, temp: 42.448 }, { ano: 2021, temp: 41.320 },
-  { ano: 2022, temp: 38.849 },
+  { ano: 2017, temp: 35.718 }, { ano: 2020, temp: 42.448 },
+  { ano: 2021, temp: 41.320 }, { ano: 2022, temp: 38.849 },
 ]
 
 export const DADOS_REAIS_COM = [
@@ -27,7 +26,7 @@ export const REGRESSAO_EXPANSAO = { slope: -0.022, intercept: 37.4 }
 
 const BASE_2023 = DADOS_REAIS_COM.find(d => d.ano === 2023).temp
 
-export const ANOS_PROJECAO = Array.from({ length: 2035 - 2016 + 1 }, (_, i) => 2016 + i)
+export const ANOS_PROJECAO = Array.from({ length: 2035 - 2017 + 1 }, (_, i) => 2017 + i)
 
 export const DADOS_GRAFICO_PROJECAO = ANOS_PROJECAO.map(ano => {
   const semPrograma = REGRESSAO.semPrograma.intercept + REGRESSAO.semPrograma.slope * ano

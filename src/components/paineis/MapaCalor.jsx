@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import WebMap from '@arcgis/core/WebMap'
 import MapView from '@arcgis/core/views/MapView'
+import WebScene from '@arcgis/core/WebScene'
+import SceneView from '@arcgis/core/views/SceneView'
 import MediaLayer from '@arcgis/core/layers/MediaLayer'
 import ImageElement from '@arcgis/core/layers/support/ImageElement'
 import ExtentAndRotationGeoreference from '@arcgis/core/layers/support/ExtentAndRotationGeoreference'
@@ -9,6 +11,8 @@ import Legend from '@arcgis/core/widgets/Legend'
 import BasemapGallery from '@arcgis/core/widgets/BasemapGallery'
 import { ANOS } from '../../data/utils'
 import { WEBMAP_ID } from '../../hooks/useEnterprise'
+
+const WEBSCENE_ID = '94b5163b3e32494c8e4d6e68e5bfba33'
 
 const ICONE_CAMADAS = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -56,6 +60,7 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
   const [tocando, setTocando] = useState(false)
   const [opacidade, setOpacidade] = useState(0.6)
   const [mapaPronto, setMapaPronto] = useState(false)
+  const [modo, setModo] = useState('2d')
 
   const [painelAberto, setPainelAberto] = useState(null)
   const [legendaVisivel, setLegendaVisivel] = useState(true)
@@ -92,14 +97,16 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
     [empreendimentos, ano]
   )
 
-  // Inicializa o WebMap + MapView uma única vez — traz mapa base, renderer,
-  // clustering e popups exatamente como configurados no Enterprise. Legenda
-  // e mapa base usam os widgets nativos do ArcGIS (Legend, BasemapGallery)
-  // ligados à view, então continuam refletindo o webmap automaticamente. O
-  // painel de camadas usa checkboxes próprios (visual do app), mas a lista
-  // de camadas é montada a partir do próprio webmap.layers — então uma
-  // camada nova adicionada no Enterprise aparece aqui sem alterar o código.
+  // Modo 2D — WebMap + MapView, com renderer, clustering e popups exatamente
+  // como configurados no Enterprise. Legenda e mapa base usam os widgets
+  // nativos do ArcGIS (Legend, BasemapGallery) ligados à view, então
+  // continuam refletindo o webmap automaticamente. O painel de camadas usa
+  // checkboxes próprios (visual do app), mas a lista de camadas é montada a
+  // partir do próprio webmap.layers — então uma camada nova adicionada no
+  // Enterprise aparece aqui sem alterar o código.
   useEffect(() => {
+    if (modo !== '2d') return
+
     const webmap = new WebMap({ portalItem: { id: WEBMAP_ID } })
     const view = new MapView({ container: mapDivRef.current, map: webmap })
     viewRef.current = view
@@ -136,8 +143,29 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
       basemapGalleryWidgetRef.current?.destroy()
       highlightHandleRef.current?.remove()
       view.destroy()
+      viewRef.current = null
+      camadaEmpreendRef.current = null
+      mediaLayerRef.current = null
+      setMapaPronto(false)
+      setCamadasWebmap([])
     }
-  }, [])
+  }, [modo])
+
+  // Modo 3D — WebScene + SceneView, reaproveitando a mesma cena 3D já
+  // configurada no Enterprise (prédios extrudados). Os controles específicos
+  // do webmap 2D (camadas, legenda, ano/raster) não se aplicam aqui.
+  useEffect(() => {
+    if (modo !== '3d') return
+
+    const webscene = new WebScene({ portalItem: { id: WEBSCENE_ID } })
+    const view = new SceneView({ container: mapDivRef.current, map: webscene })
+    viewRef.current = view
+
+    return () => {
+      view.destroy()
+      viewRef.current = null
+    }
+  }, [modo])
 
   function alternarCamadaWebmap(id) {
     setVisibilidadeCamadas(v => {
@@ -151,17 +179,16 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
   // Filtro cumulativo de pontos por ano — via definitionExpression, no
   // próprio ArcGIS, em vez de filtrar manualmente no React.
   useEffect(() => {
-    if (camadaEmpreendRef.current) {
-      camadaEmpreendRef.current.definitionExpression = `ano <= ${ano}`
-    }
-  }, [ano, mapaPronto])
+    if (modo !== '2d' || !camadaEmpreendRef.current) return
+    camadaEmpreendRef.current.definitionExpression = `ano <= ${ano}`
+  }, [ano, mapaPronto, modo])
 
   // Ao clicar num item do ranking (Top10Queda), avança o ano do slider até
   // o ano de certificação do ponto (se ele ainda não estiver visível pelo
   // filtro cumulativo), leva a view até as coordenadas do empreendimento e
   // destaca a feição correspondente na camada (highlight nativo do ArcGIS).
   useEffect(() => {
-    if (!selecionado || !mapaPronto || !viewRef.current) return
+    if (modo !== '2d' || !selecionado || !mapaPronto || !viewRef.current) return
 
     const anoIndex = ANOS.indexOf(selecionado.ano_certificacao)
     if (anoIndex !== -1 && anoIndex > indiceAno) {
@@ -194,12 +221,12 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
     }
 
     return () => { cancelado = true }
-  }, [selecionado, mapaPronto])
+  }, [selecionado, mapaPronto, modo])
 
   // Camada de imagem (raster) georreferenciada — equivalente ao
   // ImageOverlay do Leaflet, via MediaLayer + ImageElement.
   useEffect(() => {
-    if (!viewRef.current?.map) return
+    if (modo !== '2d' || !viewRef.current?.map) return
 
     if (mediaLayerRef.current) {
       viewRef.current.map.remove(mediaLayerRef.current)
@@ -231,7 +258,7 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
 
     viewRef.current.map.add(mediaLayer)
     mediaLayerRef.current = mediaLayer
-  }, [ano, boundsAno, camadaRaster, mapaPronto])
+  }, [ano, boundsAno, camadaRaster, mapaPronto, modo])
 
   useEffect(() => {
     if (mediaLayerRef.current) mediaLayerRef.current.opacity = opacidade
@@ -252,114 +279,148 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
 
         <div className="mapa-ferramentas">
           <div className="ferramenta-grupo">
-            <button
-              className={`ferramenta-btn ${painelAberto === 'camadas' ? 'ativo' : ''}`}
-              onClick={() => alternarPainel('camadas')}
-              title="Ligar/desligar camadas"
-              aria-label="Ligar/desligar camadas"
-            >
-              {ICONE_CAMADAS}
-            </button>
-            {painelAberto === 'camadas' && (
-              <div className="ferramenta-painel">
-                <label>
-                  <input type="checkbox" checked={camadaRaster} onChange={() => setCamadaRaster(v => !v)} />
-                  Raster de temperatura
-                </label>
-                {camadasWebmap.map(c => (
-                  <label key={c.id}>
-                    <input
-                      type="checkbox"
-                      checked={visibilidadeCamadas[c.id] ?? true}
-                      onChange={() => alternarCamadaWebmap(c.id)}
-                    />
-                    {c.title}
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="ferramenta-grupo">
-            <button
-              className={`ferramenta-btn ${legendaVisivel ? 'ativo' : ''}`}
-              onClick={() => setLegendaVisivel(v => !v)}
-              title="Ligar/desligar legenda"
-              aria-label="Ligar/desligar legenda"
-            >
-              {ICONE_LEGENDA}
-            </button>
-          </div>
-
-          <div className="ferramenta-grupo">
-            <button
-              className={`ferramenta-btn ${painelAberto === 'basemap' ? 'ativo' : ''}`}
-              onClick={() => alternarPainel('basemap')}
-              title="Mudar mapa base"
-              aria-label="Mudar mapa base"
-            >
-              {ICONE_BASEMAP}
-            </button>
-            <div
-              className="ferramenta-painel"
-              style={{ display: painelAberto === 'basemap' ? 'flex' : 'none' }}
-            >
-              {/* BasemapGallery nativo — mesma galeria de mapas base
-                  configurada na organização do ArcGIS Enterprise. */}
-              <div ref={basemapGaleriaDivRef} className="basemap-webmap-galeria" />
+            <div className="mapa-toggle-modo">
+              <button
+                className={modo === '2d' ? 'ativo' : ''}
+                onClick={() => setModo('2d')}
+              >
+                2D
+              </button>
+              <button
+                className={modo === '3d' ? 'ativo' : ''}
+                onClick={() => setModo('3d')}
+              >
+                3D
+              </button>
             </div>
           </div>
+
+          {modo === '2d' && (
+            <>
+              <div className="ferramenta-grupo">
+                <button
+                  className={`ferramenta-btn ${painelAberto === 'camadas' ? 'ativo' : ''}`}
+                  onClick={() => alternarPainel('camadas')}
+                  title="Ligar/desligar camadas"
+                  aria-label="Ligar/desligar camadas"
+                >
+                  {ICONE_CAMADAS}
+                </button>
+                {painelAberto === 'camadas' && (
+                  <div className="ferramenta-painel">
+                    <label>
+                      <input type="checkbox" checked={camadaRaster} onChange={() => setCamadaRaster(v => !v)} />
+                      Raster de temperatura
+                    </label>
+                    {camadasWebmap.map(c => (
+                      <label key={c.id}>
+                        <input
+                          type="checkbox"
+                          checked={visibilidadeCamadas[c.id] ?? true}
+                          onChange={() => alternarCamadaWebmap(c.id)}
+                        />
+                        {c.title}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="ferramenta-grupo">
+                <button
+                  className={`ferramenta-btn ${legendaVisivel ? 'ativo' : ''}`}
+                  onClick={() => setLegendaVisivel(v => !v)}
+                  title="Ligar/desligar legenda"
+                  aria-label="Ligar/desligar legenda"
+                >
+                  {ICONE_LEGENDA}
+                </button>
+              </div>
+
+              <div className="ferramenta-grupo">
+                <button
+                  className={`ferramenta-btn ${painelAberto === 'basemap' ? 'ativo' : ''}`}
+                  onClick={() => alternarPainel('basemap')}
+                  title="Mudar mapa base"
+                  aria-label="Mudar mapa base"
+                >
+                  {ICONE_BASEMAP}
+                </button>
+                <div
+                  className="ferramenta-painel"
+                  style={{ display: painelAberto === 'basemap' ? 'flex' : 'none' }}
+                >
+                  {/* BasemapGallery nativo — mesma galeria de mapas base
+                      configurada na organização do ArcGIS Enterprise. */}
+                  <div ref={basemapGaleriaDivRef} className="basemap-webmap-galeria" />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
-        <div className="mapa-legenda" style={{ display: legendaVisivel ? 'block' : 'none' }}>
-          <div className="legenda-nota">Números em círculo = agrupamentos (cor = média do grupo)</div>
-          {/* Legend nativo — mostra a simbologia real de cada camada do
-              webmap (Empreendimentos, Bairros, Corredores Verdes etc.)
-              exatamente como configurada no Enterprise, sem precisar
-              atualizar este componente quando uma camada é adicionada. */}
-          <div ref={legendaDivRef} className="legenda-webmap" />
-          <div className="legenda-titulo">Temperatura de superfície</div>
-          <div className="legenda-barra raster" />
-          <div className="legenda-labels">
-            <span>25°C</span><span>48°C</span>
+        {modo === '2d' && (
+          <div className="mapa-legenda" style={{ display: legendaVisivel ? 'block' : 'none' }}>
+            <div className="legenda-nota">Números em círculo = agrupamentos (cor = média do grupo)</div>
+            {/* Legend nativo — mostra a simbologia real de cada camada do
+                webmap (Empreendimentos, Bairros, Corredores Verdes etc.)
+                exatamente como configurada no Enterprise, sem precisar
+                atualizar este componente quando uma camada é adicionada. */}
+            <div ref={legendaDivRef} className="legenda-webmap" />
+            <div className="legenda-titulo">Temperatura de superfície</div>
+            <div className="legenda-barra raster" />
+            <div className="legenda-labels">
+              <span>25°C</span><span>48°C</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      <div className="mapa-controles">
-        <button className="play-btn" onClick={() => setTocando(t => !t)} aria-label="Reproduzir">
-          {tocando ? '❚❚' : '▶'}
-        </button>
-        <div className="ano-atual">{ano}</div>
-        <input
-          type="range"
-          min={0}
-          max={ANOS.length - 1}
-          step={1}
-          value={indiceAno}
-          onChange={e => { setTocando(false); setIndiceAno(Number(e.target.value)) }}
-        />
-        <div className="opacidade-controle">
-          Opacidade
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={opacidade}
-            onChange={e => setOpacidade(Number(e.target.value))}
-          />
-        </div>
-      </div>
-      <p className="mapa-nota">
-        Ao mudar o ano, o mapa de calor (raster) é atualizado e os
-        empreendimentos certificados até aquele ano são exibidos
-        progressivamente ({pontosVisiveis.length} de {empreendimentos.length} em {ano}).
-        Cor e tamanho dos pontos refletem sempre a variação de temperatura
-        desde 2023 (delta_2023), que é fixa por empreendimento — mapa base,
-        simbologia e agrupamento vêm diretamente do Web Map configurado no
-        ArcGIS Enterprise.
-      </p>
+      {modo === '2d' && (
+        <>
+          <div className="mapa-controles">
+            <button className="play-btn" onClick={() => setTocando(t => !t)} aria-label="Reproduzir">
+              {tocando ? '❚❚' : '▶'}
+            </button>
+            <div className="ano-atual">{ano}</div>
+            <input
+              type="range"
+              min={0}
+              max={ANOS.length - 1}
+              step={1}
+              value={indiceAno}
+              onChange={e => { setTocando(false); setIndiceAno(Number(e.target.value)) }}
+            />
+            <div className="opacidade-controle">
+              Opacidade
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={opacidade}
+                onChange={e => setOpacidade(Number(e.target.value))}
+              />
+            </div>
+          </div>
+          <p className="mapa-nota">
+            Ao mudar o ano, o mapa de calor (raster) é atualizado e os
+            empreendimentos certificados até aquele ano são exibidos
+            progressivamente ({pontosVisiveis.length} de {empreendimentos.length} em {ano}).
+            Cor e tamanho dos pontos refletem sempre a variação de temperatura
+            desde 2023 (delta_2023), que é fixa por empreendimento — mapa base,
+            simbologia e agrupamento vêm diretamente do Web Map configurado no
+            ArcGIS Enterprise.
+          </p>
+        </>
+      )}
+      {modo === '3d' && (
+        <p className="mapa-nota">
+          Cena 3D configurada no ArcGIS Enterprise — navegue com o mouse
+          (arrastar para girar, scroll para zoom). Os controles de ano,
+          camadas e legenda do modo 2D não se aplicam aqui.
+        </p>
+      )}
     </div>
   )
 }

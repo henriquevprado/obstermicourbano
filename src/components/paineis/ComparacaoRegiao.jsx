@@ -2,7 +2,9 @@ import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ReferenceLine,
 } from 'recharts'
-import comparacao from '../../data/comparacao_geral.json'
+import comparacaoCompleta from '../../data/comparacao_geral.json'
+
+const comparacao = comparacaoCompleta.filter(d => d.ano !== 2016)
 
 export default function ComparacaoRegiao() {
   return (

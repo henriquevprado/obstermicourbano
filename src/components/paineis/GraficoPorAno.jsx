@@ -1,13 +1,7 @@
 import { useMemo } from 'react'
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LabelList, ResponsiveContainer } from 'recharts'
 
 const ORDEM = [2023, 2024, 2025, 2026]
-const ANO_CORES = {
-  2023: 'var(--azul)',
-  2024: 'var(--verde)',
-  2025: 'var(--laranja)',
-  2026: 'var(--amarelo)',
-}
 
 export default function GraficoPorAno({ empreendimentos }) {
   const dados = useMemo(() => {
@@ -17,28 +11,16 @@ export default function GraficoPorAno({ empreendimentos }) {
     })
     return ORDEM
       .filter(ano => contagem[ano])
-      .map(ano => ({ nome: String(ano), valor: contagem[ano], cor: ANO_CORES[ano] }))
+      .map(ano => ({ ano: String(ano), valor: contagem[ano] }))
   }, [empreendimentos])
 
   return (
     <div className="card">
-      <ResponsiveContainer width="100%" height={260}>
-        <PieChart>
-          <Pie
-            data={dados}
-            dataKey="valor"
-            nameKey="nome"
-            cx="50%"
-            cy="50%"
-            innerRadius={55}
-            outerRadius={85}
-            paddingAngle={2}
-            label={({ nome, valor }) => `${valor}`}
-          >
-            {dados.map(d => (
-              <Cell key={d.nome} fill={d.cor} />
-            ))}
-          </Pie>
+      <ResponsiveContainer width="100%" height={240}>
+        <BarChart data={dados}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+          <XAxis dataKey="ano" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
+          <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 12 }} allowDecimals={false} />
           <Tooltip
             contentStyle={{
               background: 'var(--bg-surface)',
@@ -46,10 +28,12 @@ export default function GraficoPorAno({ empreendimentos }) {
               borderRadius: 8,
               fontSize: 13,
             }}
-            formatter={(v, n) => [`${v} empreendimentos`, n]}
+            formatter={v => [`${v} empreendimentos`, '']}
           />
-          <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text-secondary)' }} />
-        </PieChart>
+          <Bar dataKey="valor" fill="var(--azul)" radius={[4, 4, 0, 0]}>
+            <LabelList dataKey="valor" position="top" fill="var(--text-primary)" fontSize={12} fontWeight={600} />
+          </Bar>
+        </BarChart>
       </ResponsiveContainer>
     </div>
   )

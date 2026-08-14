@@ -19,7 +19,7 @@ export const CERT_CORES = {
   DIAMANTE: 'var(--cert-diamante)',
 }
 
-export const ANOS = [2016, 2017, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+export const ANOS = [2017, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
 
 export const TILE_SATELITE = {
   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',

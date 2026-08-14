@@ -5,12 +5,11 @@ import EvolucaoTemperatura from '../paineis/EvolucaoTemperatura'
 import Top10Queda from '../paineis/Top10Queda'
 import GraficoCertificacao from '../paineis/GraficoCertificacao'
 import GraficoPorAno from '../paineis/GraficoPorAno'
-import BotaoCena3D from '../paineis/BotaoCena3D'
 import ComparacaoRegiao from '../paineis/ComparacaoRegiao'
 import TabelaEmpreendimentos from '../paineis/TabelaEmpreendimentos'
 import { useEmpreendimentos } from '../../hooks/useEnterprise'
 
-export default function AbaEmpreendimentos() {
+export default function AbaEmpreendimentos({ onMonitorar }) {
   const { data: empreendimentos, loading, error } = useEmpreendimentos()
   const [empreendimentoSelecionado, setEmpreendimentoSelecionado] = useState(null)
 
@@ -38,13 +37,8 @@ export default function AbaEmpreendimentos() {
 
       <section className="secao grid-mapa">
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-            <div>
-              <div className="secao-titulo">Mapa de calor</div>
-              <div className="secao-subtitulo">Temperatura de superfície e empreendimentos</div>
-            </div>
-            <BotaoCena3D />
-          </div>
+          <div className="secao-titulo">Mapa de calor</div>
+          <div className="secao-subtitulo">Temperatura de superfície e empreendimentos</div>
           <p className="secao-desc">
             Sobreposição raster de temperatura de superfície (Landsat) por ano,
             com os empreendimentos certificados plotados por variação de
@@ -87,7 +81,7 @@ export default function AbaEmpreendimentos() {
       <section className="secao">
         <div className="secao-titulo">Detalhamento</div>
         <div className="secao-subtitulo">Todos os empreendimentos</div>
-        <TabelaEmpreendimentos empreendimentos={empreendimentos} />
+        <TabelaEmpreendimentos empreendimentos={empreendimentos} onMonitorar={onMonitorar} />
       </section>
     </>
   )

@@ -14,13 +14,20 @@ const ABAS = [
 
 export default function App() {
   const [abaAtiva, setAbaAtiva] = useState('empreendimentos')
+  const [seiParaMonitorar, setSeiParaMonitorar] = useState(null)
+
+  function irParaMonitoramento(sei) {
+    setSeiParaMonitorar(sei)
+    setAbaAtiva('monitoramento')
+  }
+
   return (
     <>
       <Cabecalho abaAtiva={abaAtiva} onAba={setAbaAtiva} abas={ABAS} />
       <Hero />
       <main className="container">
-        {abaAtiva === 'empreendimentos' && <AbaEmpreendimentos />}
-        {abaAtiva === 'monitoramento'   && <AbaMonitoramento />}
+        {abaAtiva === 'empreendimentos' && <AbaEmpreendimentos onMonitorar={irParaMonitoramento} />}
+        {abaAtiva === 'monitoramento'   && <AbaMonitoramento seiInicial={seiParaMonitorar} />}
         {abaAtiva === 'projecao'        && <AbaProjecao />}
       </main>
       <Rodape />

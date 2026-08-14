@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, CircleMarker, useMap } from 'react-leaflet'
 import { ReactCompareSlider, ReactCompareSliderImage, ReactCompareSliderHandle } from 'react-compare-slider'
 import { useEmpreendimentos, buscarAnexosOrdenados } from '../../hooks/useEnterprise'
 import { CERT_CORES, formatarDelta, TILE_SATELITE } from '../../data/utils'
+import ModalRelatorioEvolucao from '../paineis/ModalRelatorioEvolucao'
 
 const CENTRO_PADRAO = [-30.0305, -51.1895]
 const QTD_LISTA = 5
@@ -29,7 +30,7 @@ function CorrigirTamanho() {
   return null
 }
 
-export default function AbaMonitoramento() {
+export default function AbaMonitoramento({ seiInicial }) {
   const { data: empreendimentos, loading } = useEmpreendimentos()
   const [busca, setBusca] = useState('')
   const [selecionado, setSelecionado] = useState(null)
@@ -38,6 +39,7 @@ export default function AbaMonitoramento() {
   const [marcados, setMarcados] = useState([])
   const [comparando, setComparando] = useState(false)
   const [disponibilidade, setDisponibilidade] = useState({})
+  const [relatorioAberto, setRelatorioAberto] = useState(false)
 
   const listaCurada = useMemo(() => {
     const ordenado = [...empreendimentos].sort((a, b) => a.delta_2023 - b.delta_2023)
@@ -66,6 +68,15 @@ export default function AbaMonitoramento() {
     return () => { cancelado = true }
   }, [listaCurada])
 
+  // Pré-seleciona o empreendimento vindo do botão "Monitorar" da tabela —
+  // busca na lista completa (não só na curada), já que pode ser qualquer
+  // um dos 118.
+  useEffect(() => {
+    if (!seiInicial || empreendimentos.length === 0) return
+    const encontrado = empreendimentos.find(e => e.sei === seiInicial)
+    if (encontrado) setSelecionado(encontrado)
+  }, [seiInicial, empreendimentos])
+
   useEffect(() => {
     if (!selecionado) return
     setCarregandoAnexos(true)
@@ -81,22 +92,30 @@ export default function AbaMonitoramento() {
   }
 
   function toggleAnexo(id) {
-    setMarcados(sel => {
-      if (sel.includes(id)) return sel.filter(s => s !== id)
-      if (sel.length >= 2) return sel
-      return [...sel, id]
-    })
+    setMarcados(sel => (
+      sel.includes(id) ? sel.filter(s => s !== id) : [...sel, id]
+    ))
   }
 
-  const imagensComparacao = marcados.map(id => anexos.find(a => a.id === id)).filter(Boolean)
+  function abrirRelatorio() {
+    if (!selecionado) return
+    setRelatorioAberto(true)
+  }
+
+  // anexos já vem ordenado cronologicamente — com 2+ marcados, o relatório e
+  // o swipe usam exatamente essas imagens, na mesma ordem.
+  const anexosMarcados = anexos.filter(a => marcados.includes(a.id))
+  const imagensComparacao = anexosMarcados.length >= 2
+    ? [anexosMarcados[0], anexosMarcados[anexosMarcados.length - 1]]
+    : []
 
   return (
     <section className="secao">
       <div className="secao-titulo">Monitoramento</div>
       <div className="secao-subtitulo">Comparação de imagens antes/depois por empreendimento</div>
       <p className="secao-desc">
-        Selecione um empreendimento e duas imagens para comparar visualmente
-        a evolução do local com a ferramenta de arraste (swipe).
+        Selecione um empreendimento e duas ou mais imagens para comparar
+        visualmente a evolução do local com a ferramenta de arraste (swipe).
       </p>
 
       <div className="monitoramento-layout">
@@ -150,7 +169,6 @@ export default function AbaMonitoramento() {
                   <input
                     type="checkbox"
                     checked={marcados.includes(a.id)}
-                    disabled={!marcados.includes(a.id) && marcados.length >= 2}
                     onChange={() => toggleAnexo(a.id)}
                   />
                   <img src={a.url} alt={a.nome} />
@@ -164,10 +182,18 @@ export default function AbaMonitoramento() {
                   <button
                     className="filtro-btn ativo"
                     style={{ width: '100%' }}
-                    disabled={marcados.length !== 2}
+                    disabled={marcados.length < 2}
                     onClick={() => setComparando(true)}
                   >
                     Comparar (Swipe)
+                  </button>
+                  <button
+                    className="filtro-btn"
+                    style={{ width: '100%', marginTop: 8 }}
+                    disabled={marcados.length < 2}
+                    onClick={abrirRelatorio}
+                  >
+                    Gerar Relatório de Evolução
                   </button>
                   <button
                     className="filtro-btn geobim-btn"
@@ -186,29 +212,56 @@ export default function AbaMonitoramento() {
         </aside>
 
         <div className="monitoramento-principal">
-          <div className="monitoramento-minimapa">
-            <MapContainer center={CENTRO_PADRAO} zoom={13} style={{ width: '100%', height: '100%' }}>
-              <TileLayer url={TILE_SATELITE.url} attribution={TILE_SATELITE.attribution} />
-              <CorrigirTamanho />
-              {selecionado && (
-                <>
-                  <FlyToSelecionado lat={selecionado.lat} lon={selecionado.lon} />
-                  <CircleMarker
-                    center={[selecionado.lat, selecionado.lon]}
-                    radius={9}
-                    pathOptions={{ color: 'var(--azul-claro)', fillColor: 'var(--azul-claro)', fillOpacity: 0.8, weight: 2 }}
-                  />
-                </>
-              )}
-            </MapContainer>
-          </div>
+          {selecionado && (
+            <div className="monitoramento-minimapa-canto">
+              <MapContainer center={[selecionado.lat, selecionado.lon]} zoom={16} style={{ width: '100%', height: '100%' }} zoomControl={false}>
+                <TileLayer url={TILE_SATELITE.url} attribution={TILE_SATELITE.attribution} />
+                <CorrigirTamanho />
+                <FlyToSelecionado lat={selecionado.lat} lon={selecionado.lon} />
+                <CircleMarker
+                  center={[selecionado.lat, selecionado.lon]}
+                  radius={8}
+                  pathOptions={{ color: 'var(--azul)', fillColor: 'var(--azul)', fillOpacity: 0.85, weight: 2 }}
+                />
+              </MapContainer>
+            </div>
+          )}
 
           <div className="monitoramento-conteudo">
-            {!comparando && (
+            {!selecionado && (
               <div className="monitoramento-vazio-principal">
-                Selecione um empreendimento e duas imagens para comparar.
+                Selecione um empreendimento e duas ou mais imagens para comparar.
               </div>
             )}
+
+            {selecionado && (
+              <div className="monitoramento-indicadores-selecao">
+                <div className="grid-indicadores">
+                  <div className={`card-indicador ${selecionado.delta_2023 < 0 ? 'frio' : 'quente'}`}>
+                    <div className="rotulo">Redução de temperatura</div>
+                    <div className="valor">{formatarDelta(selecionado.delta_2023)}</div>
+                  </div>
+                  <div className="card-indicador">
+                    <div className="rotulo">Imagens disponíveis</div>
+                    <div className="valor">{carregandoAnexos ? '…' : anexos.length}</div>
+                  </div>
+                  <div className="card-indicador verde">
+                    <div className="rotulo">Árvores implantadas</div>
+                    <div className="valor">{selecionado.arvores_implantadas ?? '—'}</div>
+                  </div>
+                  <div className="card-indicador">
+                    <div className="rotulo">Telhado verde</div>
+                    <div className="valor">{selecionado.telhado_verde_m2 ?? 0} m²</div>
+                  </div>
+                </div>
+                {!comparando && (
+                  <p className="monitoramento-dica">
+                    Marque duas ou mais imagens na barra lateral e clique em "Comparar (Swipe)" para visualizar a evolução.
+                  </p>
+                )}
+              </div>
+            )}
+
             {comparando && imagensComparacao.length === 2 && (
               <div className="swipe-area">
                 <div className="swipe-header">
@@ -231,6 +284,14 @@ export default function AbaMonitoramento() {
           </div>
         </div>
       </div>
+
+      {relatorioAberto && (
+        <ModalRelatorioEvolucao
+          empreendimento={selecionado}
+          anexos={anexosMarcados}
+          onClose={() => setRelatorioAberto(false)}
+        />
+      )}
     </section>
   )
 }
