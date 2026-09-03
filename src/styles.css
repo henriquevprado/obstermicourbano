@@ -582,6 +582,68 @@ tbody td { padding: 10px 14px; color: var(--text-primary); }
 .mapa-toggle-modo button:hover { color: #fff; }
 .mapa-toggle-modo button.ativo { background: var(--azul); color: #fff; }
 
+/* Comparador de Street View (Aba Monitoramento) */
+.streetview-secao { margin-top: 20px; }
+.streetview-titulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.streetview-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.streetview-erro {
+  color: var(--temp-quente);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.streetview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.streetview-coluna { display: flex; flex-direction: column; gap: 6px; }
+.streetview-seletor-data {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  background: var(--bg-surface-3);
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+.streetview-seletor-data select {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+  cursor: pointer;
+  outline: none;
+}
+.streetview-seletor-data select option {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  text-transform: capitalize;
+}
+.streetview-painel {
+  height: 420px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+@media (max-width: 900px) {
+  .streetview-grid { grid-template-columns: 1fr; }
+}
+
 /* Widgets nativos do ArcGIS (Legend, BasemapGallery) embutidos nos painéis
    flutuantes — dimensionados para não estourar o layout. */
 .basemap-webmap-galeria {

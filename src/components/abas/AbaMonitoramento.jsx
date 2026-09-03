@@ -4,6 +4,7 @@ import { ReactCompareSlider, ReactCompareSliderImage, ReactCompareSliderHandle }
 import { useEmpreendimentos, buscarAnexosOrdenados } from '../../hooks/useEnterprise'
 import { CERT_CORES, formatarDelta, TILE_SATELITE } from '../../data/utils'
 import ModalRelatorioEvolucao from '../paineis/ModalRelatorioEvolucao'
+import StreetViewComparador from '../paineis/StreetViewComparador'
 
 const CENTRO_PADRAO = [-30.0305, -51.1895]
 const QTD_LISTA = 5
@@ -284,6 +285,14 @@ export default function AbaMonitoramento({ seiInicial }) {
           </div>
         </div>
       </div>
+
+      {selecionado && (
+        <StreetViewComparador
+          lat={selecionado.lat}
+          lon={selecionado.lon}
+          endereco={selecionado.endereco}
+        />
+      )}
 
       {relatorioAberto && (
         <ModalRelatorioEvolucao
