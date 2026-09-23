@@ -1047,3 +1047,11 @@ tbody td { padding: 10px 14px; color: var(--text-primary); }
   border: 1px solid var(--border);
   cursor: not-allowed;
 }
+
+/* Abas do painel de ranking (parte de baixo do gráfico) */
+.ranking-abas {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}

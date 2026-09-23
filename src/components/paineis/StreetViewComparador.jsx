@@ -150,7 +150,7 @@ export default function StreetViewComparador({ lat, lon, endereco }) {
 
   return (
     <div className="card streetview-secao">
-      <div className="streetview-titulo">Comparador de Street View</div>
+      <div className="streetview-titulo">Comparativo de fachada</div>
       <p className="streetview-desc">
         {endereco} — navegue em um dos painéis; o ângulo de visão é
         espelhado automaticamente no outro.{' '}

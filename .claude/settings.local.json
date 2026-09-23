@@ -53,7 +53,9 @@
       "Bash(npx eslint *)",
       "Bash(cp .env.local.example .env.local)",
       "Bash(npx next *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(curl -s '__TRACKED_VAR__/bairros_centrais/FeatureServer/50/query?where=1%3D1&returnCountOnly=true&f=json')",
+      "Bash(curl -s __TRACKED_VAR__/bairros_centrais/FeatureServer/50?f=json)"
     ]
   }
 }

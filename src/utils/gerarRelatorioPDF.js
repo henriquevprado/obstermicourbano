@@ -80,9 +80,17 @@ export async function gerarRelatorioPDF(empreendimento, anexosSelecionados, logo
   // --- Info do empreendimento ---
   doc.setFontSize(9.5)
   doc.setTextColor(CORES.cinzaTexto)
-  const infoTexto = `Empreendimento: ${empreendimento.endereco}   |   Certificação: ${empreendimento.certificado}   |   Período: ${anos[0]} → ${anos[anos.length - 1]}   |   Registros: ${anos.length}   |   Variação: ${empreendimento.delta_2023} °C`
-  doc.text(infoTexto, margem, y, { maxWidth: larguraUtil })
-  y += 10
+  const variacao = Number(empreendimento.delta_2023).toFixed(2).replace('.', ',')
+  const linhasInfo = [
+    `Empreendimento: ${empreendimento.endereco}`,
+    `Certificação: ${empreendimento.certificado}   |   Período: ${anos[0]} – ${anos[anos.length - 1]}   |   Registros: ${anos.length}   |   Variação: ${variacao} °C`,
+  ]
+  linhasInfo.forEach(linha => {
+    const quebradas = doc.splitTextToSize(linha, larguraUtil)
+    doc.text(quebradas, margem, y)
+    y += quebradas.length * 5
+  })
+  y += 5
 
   // --- Cards por ano ---
   for (const ano of anos) {

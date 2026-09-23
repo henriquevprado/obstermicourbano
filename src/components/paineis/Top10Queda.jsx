@@ -17,36 +17,34 @@ export default function Top10Queda({ empreendimentos, onSelecionar }) {
   }, [empreendimentos])
 
   return (
-    <div className="card">
-      <ResponsiveContainer width="100%" height={600}>
-        <BarChart data={dados} layout="vertical" margin={{ left: 10, right: 20 }}>
-          <CartesianGrid stroke="var(--border)" horizontal={false} />
-          <XAxis type="number" stroke="var(--text-muted)" fontSize={12} unit="°C" />
-          <YAxis
-            type="category"
-            dataKey="endereco"
-            stroke="var(--text-muted)"
-            fontSize={11}
-            width={140}
-          />
-          <Tooltip
-            contentStyle={{
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              fontSize: 13,
-            }}
-            formatter={v => [formatarDelta(v), 'Variação']}
-          />
-          <Bar
-            dataKey="delta"
-            fill="var(--azul)"
-            radius={[0, 4, 4, 0]}
-            cursor="pointer"
-            onClick={d => onSelecionar?.(d.empreendimento)}
-          />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+    <ResponsiveContainer width="100%" height={560}>
+      <BarChart data={dados} layout="vertical" margin={{ left: 10, right: 20 }}>
+        <CartesianGrid stroke="var(--border)" horizontal={false} />
+        <XAxis type="number" stroke="var(--text-muted)" fontSize={12} unit="°C" />
+        <YAxis
+          type="category"
+          dataKey="endereco"
+          stroke="var(--text-muted)"
+          fontSize={11}
+          width={140}
+        />
+        <Tooltip
+          contentStyle={{
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 8,
+            fontSize: 13,
+          }}
+          formatter={v => [formatarDelta(v), 'Variação']}
+        />
+        <Bar
+          dataKey="delta"
+          fill="var(--azul)"
+          radius={[0, 4, 4, 0]}
+          cursor="pointer"
+          onClick={d => onSelecionar?.(d.empreendimento)}
+        />
+      </BarChart>
+    </ResponsiveContainer>
   )
 }

@@ -4,7 +4,7 @@ import {
 } from 'recharts'
 import comparacaoCompleta from '../../data/comparacao_geral.json'
 
-const comparacao = comparacaoCompleta.filter(d => d.ano !== 2016)
+const comparacao = comparacaoCompleta.filter(d => d.ano >= 2020)
 
 export default function ComparacaoRegiao() {
   return (

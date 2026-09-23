@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import Indicadores from '../paineis/Indicadores'
 import MapaCalor from '../paineis/MapaCalor'
-import EvolucaoTemperatura from '../paineis/EvolucaoTemperatura'
-import Top10Queda from '../paineis/Top10Queda'
+import PainelRanking from '../paineis/PainelRanking'
 import GraficoCertificacao from '../paineis/GraficoCertificacao'
 import GraficoPorAno from '../paineis/GraficoPorAno'
 import ComparacaoRegiao from '../paineis/ComparacaoRegiao'
@@ -49,7 +48,7 @@ export default function AbaEmpreendimentos({ onMonitorar }) {
         <div>
           <div className="secao-titulo">Ranking</div>
           <div className="secao-subtitulo">Maiores quedas de temperatura</div>
-          <Top10Queda empreendimentos={empreendimentos} onSelecionar={setEmpreendimentoSelecionado} />
+          <PainelRanking empreendimentos={empreendimentos} onSelecionar={setEmpreendimentoSelecionado} />
         </div>
       </section>
 
@@ -59,21 +58,15 @@ export default function AbaEmpreendimentos({ onMonitorar }) {
         <ComparacaoRegiao />
       </section>
 
-      <section className="secao">
-        <div className="secao-titulo">Série histórica</div>
-        <div className="secao-subtitulo">Evolução da temperatura média</div>
-        <EvolucaoTemperatura empreendimentos={empreendimentos} />
-      </section>
-
       <section className="secao grid-2">
         <div>
           <div className="secao-titulo">Certificação</div>
-          <div className="secao-subtitulo">Distribuição dos empreendimentos</div>
+          <div className="secao-subtitulo">Redução média de temperatura por tipo de certificação</div>
           <GraficoCertificacao empreendimentos={empreendimentos} />
         </div>
         <div>
           <div className="secao-titulo">Certificação</div>
-          <div className="secao-subtitulo">Segmentação por ano de certificação</div>
+          <div className="secao-subtitulo">Redução média de temperatura por ano de certificação</div>
           <GraficoPorAno empreendimentos={empreendimentos} />
         </div>
       </section>

@@ -4,7 +4,7 @@ export const REGRESSAO = {
 }
 
 export const DADOS_REAIS_SEM = [
-  { ano: 2017, temp: 35.718 }, { ano: 2020, temp: 42.448 },
+  { ano: 2020, temp: 42.448 },
   { ano: 2021, temp: 41.320 }, { ano: 2022, temp: 38.849 },
 ]
 
@@ -26,7 +26,7 @@ export const REGRESSAO_EXPANSAO = { slope: -0.022, intercept: 37.4 }
 
 const BASE_2023 = DADOS_REAIS_COM.find(d => d.ano === 2023).temp
 
-export const ANOS_PROJECAO = Array.from({ length: 2035 - 2017 + 1 }, (_, i) => 2017 + i)
+export const ANOS_PROJECAO = Array.from({ length: 2035 - 2020 + 1 }, (_, i) => 2020 + i)
 
 export const DADOS_GRAFICO_PROJECAO = ANOS_PROJECAO.map(ano => {
   const semPrograma = REGRESSAO.semPrograma.intercept + REGRESSAO.semPrograma.slope * ano

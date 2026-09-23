@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const BASE = 'https://arcgis-ope.codexremote.com.br/server/rest/services/Hosted'
 
@@ -9,7 +9,7 @@ export const SERVICES = {
 
 export const WEBMAP_ID = '12a4367e688047c89eb89463978387ed'
 
-const ANOS_TEMP = [2016, 2017, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+const ANOS_TEMP = [2020, 2021, 2022, 2023, 2024, 2025, 2026]
 
 function normalizar(feature) {
   const p = feature.properties
@@ -77,6 +77,53 @@ export function useEmpreendimentos() {
   }, [])
 
   return { data, loading, error }
+}
+
+function pontoNoAnel(x, y, anel) {
+  let dentro = false
+  for (let i = 0, j = anel.length - 1; i < anel.length; j = i++) {
+    const [xi, yi] = anel[i]
+    const [xj, yj] = anel[j]
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) dentro = !dentro
+  }
+  return dentro
+}
+
+function pontoNoBairro(lon, lat, geometry) {
+  const poligonos = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates
+  return poligonos.some(p => pontoNoAnel(lon, lat, p[0]) && !p.slice(1).some(b => pontoNoAnel(lon, lat, b)))
+}
+
+/**
+ * Variação média de temperatura (delta_2023) por bairro. A camada de bairros
+ * só traz nome/geometria, então o cálculo é o cruzamento espacial: cada
+ * empreendimento entra na média do bairro cujo polígono o contém.
+ */
+export function useBairrosRanking(empreendimentos) {
+  const [bairros, setBairros] = useState([])
+
+  useEffect(() => {
+    const url = `${SERVICES.bairros}/query?where=1%3D1&outFields=nome&outSR=4326&f=geojson`
+    fetch(url)
+      .then(r => r.json())
+      .then(d => setBairros(d.features || []))
+      .catch(() => setBairros([]))
+  }, [])
+
+  return useMemo(() => {
+    const acc = new Map(bairros.map(b => [b.properties.nome, { soma: 0, n: 0 }]))
+    empreendimentos.forEach(e => {
+      const bairro = bairros.find(b => pontoNoBairro(e.lon, e.lat, b.geometry))
+      if (!bairro || e.delta_2023 == null) return
+      const a = acc.get(bairro.properties.nome)
+      a.soma += e.delta_2023
+      a.n += 1
+    })
+    return [...acc.entries()]
+      .filter(([, a]) => a.n > 0)
+      .map(([nome, a]) => ({ nome, delta: a.soma / a.n, quantidade: a.n }))
+      .sort((a, b) => a.delta - b.delta)
+  }, [bairros, empreendimentos])
 }
 
 // Imagens do Google Earth Pro: uso interno/demonstrativo apenas — não

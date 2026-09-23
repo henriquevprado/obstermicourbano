@@ -47,7 +47,7 @@ export default function AbaProjecao() {
           <ResponsiveContainer width="100%" height={340}>
             <ComposedChart data={DADOS_GRAFICO_PROJECAO}>
               <CartesianGrid stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="ano" type="number" domain={[2017, 2035]} stroke="var(--text-muted)" fontSize={12} />
+              <XAxis dataKey="ano" type="number" domain={[2020, 2035]} stroke="var(--text-muted)" fontSize={12} />
               <YAxis
                 stroke="var(--text-muted)"
                 fontSize={12}
