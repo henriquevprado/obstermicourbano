@@ -52,6 +52,7 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
 
   const legendaDivRef = useRef(null)
   const basemapGaleriaDivRef = useRef(null)
+  const legenda3dDivRef = useRef(null)
   const legendWidgetRef = useRef(null)
   const basemapGalleryWidgetRef = useRef(null)
 
@@ -64,6 +65,7 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
 
   const [painelAberto, setPainelAberto] = useState(null)
   const [legendaVisivel, setLegendaVisivel] = useState(true)
+  const [legenda3dVisivel, setLegenda3dVisivel] = useState(false)
   const [camadaRaster, setCamadaRaster] = useState(true)
   const [camadasWebmap, setCamadasWebmap] = useState([])
   const [visibilidadeCamadas, setVisibilidadeCamadas] = useState({})
@@ -161,7 +163,11 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
     const view = new SceneView({ container: mapDivRef.current, map: webscene })
     viewRef.current = view
 
+    // Legend nativa ligada à SceneView: reflete as camadas visíveis da cena.
+    const legend = new Legend({ view, container: legenda3dDivRef.current })
+
     return () => {
+      legend.destroy()
       view.destroy()
       viewRef.current = null
     }
@@ -295,6 +301,19 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
             </div>
           </div>
 
+          {modo === '3d' && (
+            <div className="ferramenta-grupo">
+              <button
+                className={`ferramenta-btn ${legenda3dVisivel ? 'ativo' : ''}`}
+                onClick={() => setLegenda3dVisivel(v => !v)}
+                title="Ligar/desligar legenda"
+                aria-label="Ligar/desligar legenda"
+              >
+                {ICONE_LEGENDA}
+              </button>
+            </div>
+          )}
+
           {modo === '2d' && (
             <>
               <div className="ferramenta-grupo">
@@ -358,6 +377,12 @@ export default function MapaCalor({ empreendimentos, selecionado }) {
             </>
           )}
         </div>
+
+        {modo === '3d' && (
+          <div className="mapa-legenda" style={{ display: legenda3dVisivel ? 'block' : 'none' }}>
+            <div ref={legenda3dDivRef} className="legenda-webmap" />
+          </div>
+        )}
 
         {modo === '2d' && (
           <div className="mapa-legenda" style={{ display: legendaVisivel ? 'block' : 'none' }}>

@@ -25,6 +25,7 @@ function normalizar(feature) {
     endereco: p.endereco,
     certificado: p.certificado,
     ano_certificacao: p.ano,
+    enquadramento: p.enquadramento,
     lat,
     lon,
     periodos,

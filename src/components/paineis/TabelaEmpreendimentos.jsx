@@ -16,6 +16,7 @@ const COLUNAS_FIXAS = [
   { chave: 'sei', rotulo: 'SEI' },
   { chave: 'endereco', rotulo: 'Endereço' },
   { chave: 'ano_certificacao', rotulo: 'Ano cert.' },
+  { chave: 'enquadramento', rotulo: 'Enquadramento', formato: 'capitalizar' },
 ]
 
 const GRUPOS = [
@@ -63,6 +64,7 @@ function formatarValor(valor, formato) {
     case 'temp': return `${valor.toFixed(1)}°C`
     case 'delta': return formatarDelta(valor)
     case 'm2': return `${valor} m²`
+    case 'capitalizar': return String(valor).charAt(0).toUpperCase() + String(valor).slice(1)
     case 'numero3': return valor.toFixed(3)
     default: return valor
   }
